@@ -303,7 +303,44 @@ do ->
                 @set undefined, false
                 @inited = true
             img.src = config.img
+
+
+
+            if config.img2
+
+                if config["img-size"] =>
+                    ret = config["img-size"].split(\,)
+                    size = {width: +ret.0, height: +ret.1}
+                else size = {width: 100, height: 100}
+
+                group.0 = domTree \g, rect: attr:
+                    x: 0, y: 0, width: 100, height: 100, mask: "url(\##{id.mask})", fill: config["fill-background"]
+                svg.querySelector 'mask image' .attrs do
+                    width: size.width, height: size.height
+                group.2 = domTree \g, image: attr:
+                    width: size.width, height: size.height, x: 0, y: 0, preserveAspectRatio: "xMidYMid"
+                    #width: 100, height: 100, x: 0, y: 0, preserveAspectRatio: "xMidYMid"
+                    "xlink:href": config.img2, class: \solid
+                img2 = new Image!
+                img2.addEventListener \load, ~>
+                    if config["img-size"] =>
+                        ret = config["img-size"].split(\,)
+                        size = {width: +ret.0, height: +ret.1}
+                    else if img2.width and img2.height => size = {width: img2.width, height: img2.height}
+                    else size = {width: 100, height: 100}
+                    svg.querySelector 'mask image' .attrs do
+                        width: size.width, height: size.height
+                    group.2.querySelector 'image' .attrs do
+                        width: size.width, height: size.height
+
+                    @fit!
+                    @set undefined, false
+                    @inited = true
+                img2.src = config.img2
+
             svg.appendChild group.0
+            if config.img2
+                svg.appendChild group.2
             svg.appendChild group.1
         svg.attrs width: \100%, height: \100% #, viewBox: '0 0 100 100'
 
